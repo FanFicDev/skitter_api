@@ -1,0 +1,27 @@
+skitter_api is a small wrapper around a set of FlareSolverr instances for load
+balancing and redundancy purposes. Essentially a series of docker containers
+comprised of gluetun providing a VPN connection and FlareSolverr providing CF
+workarounds are kept alive and proxied to.
+
+Currently these workers choose from a shared queue table stored in postgres;
+this is for ease-of-adapting from a previous project that was trivially
+shardable. This is far from ideal for a number of reasons. There's an initial
+effort to move to rabbitmq queues instead.
+
+Ensure you create a valid etc/nginx/auth/skitter.htpasswd file.
+
+/etc/hosts on the deploy target should contain an entry for polaris.fanfic.dev
+
+Regenerate the docker-compose.yml file:
+	cd docker/
+	./gen_docker_compose.sh > ./docker-compose.yml
+
+Create the secret files:
+	./docker/openvpn_user
+	./docker/openvpn_password
+(these should be single line files ending)
+
+This depends on the same sql that python-weaver does.
+
+Copy priv.ex.py to priv.py and generate a random api key.
+

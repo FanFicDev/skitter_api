@@ -1,0 +1,59 @@
+server {
+	listen 80;
+	listen [::]:80;
+	server_name skitter.fanfic.dev;
+	return 301 https://$host$request_uri;
+}
+
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+
+	ssl_certificate ssl/fanfic.dev.ca_file.crt;
+	ssl_certificate_key ssl/fanfic.dev.pem;
+
+	server_name skitter.fanfic.dev;
+
+	access_log /var/log/nginx/skitter.fanfic.dev_access.log main;
+	error_log /var/log/nginx/skitter.fanfic.dev_error.log;
+
+	gzip on;
+	gzip_proxied any;
+	gzip_vary on;
+	gzip_types
+		text/html
+		text/css
+		text/javascript
+		text/plain
+		application/javascript
+		application/xhtml+xml
+		application/octet-stream
+		application/epub+zip;
+
+	root /var/www/skitter.fanfic.dev;
+	index index.html;
+
+	location /favicon.ico {
+		expires 7d;
+		add_header Cache-Control "public";
+	}
+	location /.well-known/ {
+		proxy_pass http://polaris.fanfic.dev;
+		proxy_read_timeout 300s;
+	}
+	location /v0 {
+		auth_basic "skitter_api";
+		auth_basic_user_file /etc/nginx/auth/skitter.htpasswd;
+		try_files $uri @skitter_proxy;
+
+		include json_err_page.conf;
+	}
+	location @skitter_proxy {
+		include uwsgi_params;
+		uwsgi_pass 127.0.0.1:9151;
+		uwsgi_read_timeout 90s;
+	}
+
+	include json_err_loc.conf;
+}
+

@@ -1,0 +1,18 @@
+US Chicago
+US Denver
+US Florida
+US Houston
+US Las Vegas
+US Seattle
+US Silicon Valley
+US West
+CA Montreal
+CA Ontario
+CA Toronto
+CA Vancouver
+US East
+US New York
+US Texas
+US Washington DC
+US Atlanta
+US California
