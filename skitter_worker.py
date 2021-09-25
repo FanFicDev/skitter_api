@@ -68,6 +68,9 @@ def restart_worker_vpn(node: str) -> None:
 	run_command(['docker', 'restart', f'{node}_gluetun'], timeout=60)
 	time.sleep(30)
 
+	# ensure curl is available for get_worker_ip
+	run_command_in_container(f'{node}_gluetun', f'apk add curl', timeout=30)
+
 def restart_worker_fr(node: str) -> None:
 	plog(f'restart_worker_fr: restarting {node}_flaresolverr')
 	run_command(['docker', 'restart', f'{node}_flaresolverr'], timeout=60)
