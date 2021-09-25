@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+if [[ ! -f priv.py ]]; then
+	echo "err: priv.py does not exist"
+	exit 1
+fi
+
 target="${1-skitter}"
 echo "pushing to host: $target"
 
