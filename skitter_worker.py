@@ -15,12 +15,12 @@ from oil import oil
 import oil.util as util
 from weaver import WebSource, Encoding, Web, WebQueue
 import weaver.enc as enc
+from priv import LOOKUP_REMOTE_ENDPOINT
 
 defaultRequestTimeout = 60
 defaultUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'
 logFileName = 'skitter_worker.log'
 
-lookupRemoteEndpoint = 'https://weaver.fanfic.dev/v0/remote'
 publicIp = ''
 
 blockSize = 50
@@ -47,7 +47,7 @@ def run_command(cmd: List[str], timeout: float = 5
 	return stdout, stderr
 
 def get_public_ip() -> str:
-	out, _ = run_command(['curl', '-f', '-m', '7', '-s', lookupRemoteEndpoint],
+	out, _ = run_command(['curl', '-f', '-m', '7', '-s', LOOKUP_REMOTE_ENDPOINT],
 			timeout=10)
 	return out.decode('utf-8').strip()
 
@@ -60,7 +60,7 @@ def run_command_in_container(container: str, cmd: str, timeout: float = 5
 
 def get_worker_ip(node: str) -> str:
 	out, _ = run_command_in_container(f'{node}_gluetun',
-			f'curl -f -m 10 -s {lookupRemoteEndpoint}', timeout=15)
+			f'curl -f -m 10 -s {LOOKUP_REMOTE_ENDPOINT}', timeout=15)
 	return out.decode('utf-8').strip()
 
 def restart_worker_vpn(node: str) -> None:
@@ -140,7 +140,7 @@ def make_req(workerId: int, url: str, headers: Optional[Dict[str, str]] = None,
 	return FlareSolverrResponse(status, res)
 
 def get_worker_ip_fr(workerId: int) -> str:
-	r = make_req(workerId, lookupRemoteEndpoint)
+	r = make_req(workerId, LOOKUP_REMOTE_ENDPOINT)
 	if r.status != 200:
 		raise Exception('failed to determine remote address')
 	return r.response.decode('utf-8').strip()
