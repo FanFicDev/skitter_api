@@ -42,6 +42,8 @@ cat ./config.tsv | tr ',' '\n' | while read -r userf; do
       - REGION=REPPIA
       # Timezone for accurate logs times
       - TZ=
+      # disable DNS over TLS
+      - DOT=off
     restart: always
   REPHOST_flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
