@@ -9,7 +9,7 @@ import werkzeug.wrappers
 from werkzeug.exceptions import HTTPException, NotFound
 from oil import oil
 from weaver import Web, RemoteWebScraper
-from priv import API_KEY
+from priv import API_KEYS
 
 app = Flask(__name__, static_url_path='')
 defaultRequestTimeout = 60
@@ -52,7 +52,7 @@ def v0_status() -> FlaskResponse:
 @app.route('/v0/cache', methods=['GET'])
 def v0_cache() -> FlaskResponse:
 	apiKey = request.values.get('apiKey', '')
-	if apiKey != API_KEY:
+	if apiKey not in API_KEYS:
 		return make_response({'err':-401,'msg':'unauthorized'}, 401)
 
 	q = request.values.get('q', None)
@@ -82,7 +82,7 @@ def v0_cache() -> FlaskResponse:
 @app.route('/v0/crawl', methods=['GET'])
 def v0_crawl() -> FlaskResponse:
 	apiKey = request.values.get('apiKey', '')
-	if apiKey != API_KEY:
+	if apiKey not in API_KEYS:
 		return make_response({'err':-401,'msg':'unauthorized'}, 401)
 
 	q = request.values.get('q', None)

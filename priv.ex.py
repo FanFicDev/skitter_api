@@ -1,1 +1,1 @@
-API_KEY='generate an api key'
+API_KEYS={'generate an api key','or more'}
