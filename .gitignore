@@ -3,3 +3,4 @@ docker/secrets/
 docker/docker-compose.yml
 docker/config.tsv
 priv.py
+skitter_worker_*.log
