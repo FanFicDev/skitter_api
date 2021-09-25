@@ -23,5 +23,6 @@ Create the secret files:
 
 This depends on the same sql that python-weaver does.
 
-Copy priv.ex.py to priv.py and generate a random api key.
+Copy priv.ex.py to priv.py, generate a random api key, and optionally set a
+NODE_NAME.
 

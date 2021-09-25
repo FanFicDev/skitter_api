@@ -13,7 +13,7 @@ from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException, NotFound
 from oil import oil
 from weaver import Web, RemoteWebScraper
-from priv import API_KEYS
+from priv import API_KEYS, NODE_NAME
 
 app = Flask(__name__, static_url_path='')
 defaultRequestTimeout = 60
@@ -98,7 +98,7 @@ def v0_cache() -> FlaskResponse:
 		return page_not_found(NotFound())
 	print(f'v0_cache: {q=}, {u=}: found: len: {len(latest.response)}, url: {latest.url}, id: {latest.id}, created: {latest.created}')
 	fres = make_response(latest.response)
-	fres.headers['X-Weaver-Id'] = str(latest.id) + '_athena'
+	fres.headers['X-Weaver-Id'] = str(latest.id) + '_' + NODE_NAME
 	fres.headers['X-Weaver-Created'] = str(int(latest.created//1000))
 	fres.headers['X-Weaver-Url'] = str(latest.url)
 	return fres
