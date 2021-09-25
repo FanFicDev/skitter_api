@@ -1,5 +1,5 @@
 etc/nginx/auth/skitter.htpasswd
-docker/openvpn_user
-docker/openvpn_password
+docker/secrets/
 docker/docker-compose.yml
+docker/config.tsv
 priv.py

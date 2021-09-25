@@ -5,9 +5,12 @@ version: "3.7"
 services:
 HEAD
 
-for i in {0..7}; do
-	host="$(cat subdomain_list.txt | head -n $((i + 1)) | tail -n1 | cut -d'.' -f1)"
-	pia="$(cat pia_usa_list.txt | head -n $((i + 1)) | tail -n1)"
+i=0
+cat ./config.tsv | tr ',' '\n' | while read -r userf; do
+	read -r passf
+	read -r host
+	read -r pia
+	host="$(echo "$host" | cut -d'.' -f1)"
 	port="$((8191 + i))"
 	echo "# ${host} ${pia}"
 	#mkdir -p /home/skitter/docker/${host}/m
@@ -29,8 +32,10 @@ for i in {0..7}; do
     volumes:
       - /home/skitter/docker/REPHOST/m:/gluetun
     secrets:
-      - openvpn_user
-      - openvpn_password
+      - source: REPUSER
+        target: openvpn_user
+      - source: REPPASS
+        target: openvpn_password
     environment:
       # More variables are available, see the readme table
       - VPNSP=private internet access
@@ -49,14 +54,21 @@ for i in {0..7}; do
     network_mode: "service:REPHOST_gluetun"
     restart: unless-stopped
 HERE
-	} | sed -e "s/REPHOST/${host}/g" -e "s/REPPIA/${pia}/g" -e "s/REPPORT/${port}/g"
+	} | sed -e "s/REPHOST/${host}/g" -e "s/REPPORT/${port}/g" \
+		-e "s/REPPIA/${pia}/g" \
+		-e "s/REPUSER/${userf}/g" -e "s/REPPASS/${passf}/g"
+	i=$((i + 1))
 done
 
-cat<<TAIL
-secrets:
-  openvpn_user:
-    file: ./openvpn_user
-  openvpn_password:
-    file: ./openvpn_password
-TAIL
+echo ""
+echo "secrets:"
+cat ./config.tsv | cut -d',' -f1 | sort -u | while read -r userf; do
+	echo "  $userf:"
+	echo "    file: ./secrets/$userf"
+done
+
+cat ./config.tsv | cut -d',' -f2 | sort -u | while read -r passf; do
+	echo "  $passf:"
+	echo "    file: ./secrets/$passf"
+done
 

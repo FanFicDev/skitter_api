@@ -12,14 +12,20 @@ Ensure you create a valid etc/nginx/auth/skitter.htpasswd file.
 
 /etc/hosts on the deploy target should contain an entry for polaris.fanfic.dev
 
+
+Create the docker container docker/config.tsv; see docker/config.ex.tsv for an
+example. The general format is:
+	user_secret_name,pass_secret_name,subdomain,region
+
+Create the secret files referenced by the config, for example:
+	./docker/secrets/openvpn_user
+	./docker/secrets/openvpn_password
+(these should be single line files)
+
 Regenerate the docker-compose.yml file:
 	cd docker/
 	./gen_docker_compose.sh > ./docker-compose.yml
 
-Create the secret files:
-	./docker/openvpn_user
-	./docker/openvpn_password
-(these should be single line files ending)
 
 This depends on the same sql that python-weaver does.
 
