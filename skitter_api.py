@@ -1,4 +1,7 @@
-from typing import Any, Dict, Union, Tuple, Optional, cast
+from typing import (
+		Any, Dict, Union, Tuple, Optional, Generator, List,
+		Callable, Iterable
+	)
 import os
 import os.path
 import threading
@@ -6,6 +9,7 @@ from enum import IntEnum
 from flask import Flask, Response, request, render_template, \
 	make_response
 import werkzeug.wrappers
+from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException, NotFound
 from oil import oil
 from weaver import Web, RemoteWebScraper
@@ -14,8 +18,28 @@ from priv import API_KEYS
 app = Flask(__name__, static_url_path='')
 defaultRequestTimeout = 60
 
-BasicFlaskResponse = Union[Response, werkzeug.wrappers.Response, str, Dict[str, Any]]
-FlaskResponse = Union[BasicFlaskResponse, Tuple[BasicFlaskResponse, int]]
+FlaskHeaderValue = Union[str, List[str], Tuple[str, ...]]
+FlaskHeaders = Union[
+		Headers,
+		Dict[str, FlaskHeaderValue],
+		List[Tuple[str, FlaskHeaderValue]]
+	]
+BasicFlaskResponse = Union[
+		Response,
+		Any,
+		Dict[str, Any],
+		Generator[Any, None, None]
+	]
+FlaskResponse = Union[
+		BasicFlaskResponse,
+		Tuple[
+			BasicFlaskResponse,
+			FlaskHeaders
+		],
+		Tuple[BasicFlaskResponse, int],
+		Tuple[BasicFlaskResponse, int, FlaskHeaders],
+		Callable[[Dict[str, Any], BasicFlaskResponse], Iterable[bytes]]
+	]
 
 CACHE_BUSTER=1
 
@@ -36,12 +60,12 @@ def getErr(err: WebError, extra: Optional[Dict[str, Any]] = None
 	return base
 
 @app.errorhandler(404)
-def page_not_found(e: HTTPException) -> FlaskResponse:
+def page_not_found(e: Exception) -> FlaskResponse:
 	return make_response({'err':404,'msg':'not found'}, 404)
 
 @app.route('/')
 def index() -> FlaskResponse:
-	return render_template('index.html', CACHE_BUSTER=CACHE_BUSTER)
+	return make_response(render_template('index.html', CACHE_BUSTER=CACHE_BUSTER))
 
 @app.route('/v0', methods=['GET'], strict_slashes=False)
 @app.route('/v0/status', methods=['GET'])
