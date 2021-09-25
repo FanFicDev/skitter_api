@@ -17,7 +17,7 @@ cat ./config.tsv | tr ',' '\n' | while read -r userf; do
 	{
 		cat<<HERE
   REPHOST_gluetun:
-    image: qmcgaw/gluetun
+    image: qmcgaw/gluetun:v3.24.0
     container_name: REPHOST_gluetun
     cap_add:
       - NET_ADMIN
@@ -47,7 +47,7 @@ cat ./config.tsv | tr ',' '\n' | while read -r userf; do
     restart: always
   REPHOST_flaresolverr:
     # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:v1.2.9
     container_name: REPHOST_flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
