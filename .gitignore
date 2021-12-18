@@ -4,3 +4,6 @@ docker/docker-compose.yml
 docker/config.tsv
 priv.py
 skitter_worker_*.log
+logs/
+skitter_api_master.pid
+__pycache__/
