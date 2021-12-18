@@ -17,8 +17,8 @@ from weaver import WebSource, Encoding, Web, WebQueue
 import weaver.enc as enc
 from priv import LOOKUP_REMOTE_ENDPOINT
 
-defaultRequestTimeout = 60
-defaultUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'
+defaultRequestTimeout = 90
+defaultUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
 logFileName = 'skitter_worker.log'
 
 publicIp = ''
@@ -190,7 +190,7 @@ def scrape(db: 'psycopg2.connection', source: WebSource, workerId: int,
 			if title == 'Just a moment...' \
 					or title == 'Attention Required! | Cloudflare':
 				plog(f'scrape: got 200 status CF page, retrying: {triesLeft - 1}')
-				time.sleep(6 + random.random() * 2)
+				time.sleep(9 + random.random() * 2)
 				return scrape(db, source, workerId, url, triesLeft - 1)
 
 	w.save(db)
@@ -216,7 +216,7 @@ def workBlock(db: 'psycopg2.connection', workerId: int, stripeCount: int,
 		rlen = -1 if w.response is None else len(w.response)
 		plog(f'workBlock:   status {w.status}, {rlen} bytes')
 
-		time.sleep(6 + random.random() * 2)
+		time.sleep(9 + random.random() * 2)
 
 def maybe_restart_vpn(node: str) -> bool:
 	try:
