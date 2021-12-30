@@ -1,2 +1,4 @@
-openvpn_user,openvpn_password,fr0a.fanfic.dev,US Chicago
-openvpn_user,openvpn_password,fr1a.fanfic.dev,US Denver
+openvpn_user,openvpn_password,fr0a.fanfic.dev,US Chicago,v1.2.9,
+openvpn_user,openvpn_password,fr1a.fanfic.dev,US Denver,v1.2.9,
+openvpn_user,openvpn_password,fr2a.fanfic.dev,US Silicon Valley,v2.1.0,2
+openvpn_user,openvpn_password,fr3a.fanfic.dev,US West,v2.1.0,2

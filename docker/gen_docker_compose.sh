@@ -10,15 +10,17 @@ cat ./config.tsv | tr ',' '\n' | while read -r userf; do
 	read -r passf
 	read -r host
 	read -r pia
+	read -r ver
+	read -r suff
 	host="$(echo "$host" | cut -d'.' -f1)"
 	port="$((8191 + i))"
 	echo "# ${host} ${pia}"
 	#mkdir -p /home/skitter/docker/${host}/m
 	{
 		cat<<HERE
-  REPHOST_gluetun:
-    image: qmcgaw/gluetun:v3.24.0
-    container_name: REPHOST_gluetun
+  ${host}_gluetun:
+    image: qmcgaw/gluetun:v3.26.0
+    container_name: ${host}_gluetun
     cap_add:
       - NET_ADMIN
     network_mode: bridge
@@ -27,38 +29,36 @@ cat ./config.tsv | tr ',' '\n' | while read -r userf; do
       #- 127.0.0.1:8388:8388/tcp # Shadowsocks
       #- 127.0.0.1:8388:8388/udp # Shadowsocks
       #- 127.0.0.1:8000:8000/tcp # Built-in HTTP control server
-      - 127.0.0.1:REPPORT:8191/tcp
+      - 127.0.0.1:${port}:8191/tcp
     # command:
     volumes:
-      - /home/skitter/docker/REPHOST/m:/gluetun
+      - /home/skitter/docker/${host}/m:/gluetun
     secrets:
-      - source: REPUSER
+      - source: ${userf}
         target: openvpn_user
-      - source: REPPASS
+      - source: ${passf}
         target: openvpn_password
     environment:
       # More variables are available, see the readme table
       - VPNSP=private internet access
-      - REGION=REPPIA
+      - REGION=${pia}
       # Timezone for accurate logs times
-      - TZ=
+      - TZ=UTC
       # disable DNS over TLS
       - DOT=off
     restart: always
-  REPHOST_flaresolverr:
-    # DockerHub mirror flaresolverr/flaresolverr:latest
-    image: ghcr.io/flaresolverr/flaresolverr:v1.2.9
-    container_name: REPHOST_flaresolverr
+  ${host}_flaresolverr${suff}:
+    image: ghcr.io/flaresolverr/flaresolverr:${ver}
+    container_name: ${host}_flaresolverr${suff}
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-    network_mode: "service:REPHOST_gluetun"
+      - TEST_URL=http://mirror.fanfic.dev/mirror
+    network_mode: "service:${host}_gluetun"
     restart: unless-stopped
 HERE
-	} | sed -e "s/REPHOST/${host}/g" -e "s/REPPORT/${port}/g" \
-		-e "s/REPPIA/${pia}/g" \
-		-e "s/REPUSER/${userf}/g" -e "s/REPPASS/${passf}/g"
+	}
 	i=$((i + 1))
 done
 
