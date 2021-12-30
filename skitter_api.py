@@ -40,17 +40,26 @@ def v0_status() -> ResponseReturnValue:
 	return make_response({'err':0,'status':'ok',
 		'pid':os.getpid(),'tident':threading.get_ident(),})
 
+def get_request_value(key: str, dflt: Optional[str]) -> Optional[str]:
+	val = request.form.get(key, None)
+	if val is None:
+		val = request.args.get(key, None)
+	if val is None:
+		val = dflt
+	return val
+
 @app.route('/v0/cache', methods=['GET'])
 def v0_cache() -> ResponseReturnValue:
-	apiKey = request.values.get('apiKey', '')
+	apiKey = get_request_value('apiKey', '')
 	if apiKey not in API_KEYS:
 		return make_response({'err':-401,'msg':'unauthorized'}, 401)
 
-	q = request.values.get('q', None)
-	u = request.values.get('u', None)
+	q = get_request_value('q', None)
+	u = get_request_value('u', None)
 	print(f'v0_cache: {q=}, {u=}')
 	if (q is None or len(q.strip()) < 1) \
 			and (u is None or len(u.strip()) < 1):
+		print(f'v0_cache: q and u are empty')
 		return page_not_found(NotFound())
 
 	latest = None
@@ -72,11 +81,11 @@ def v0_cache() -> ResponseReturnValue:
 
 @app.route('/v0/crawl', methods=['GET'])
 def v0_crawl() -> ResponseReturnValue:
-	apiKey = request.values.get('apiKey', '')
+	apiKey = get_request_value('apiKey', '')
 	if apiKey not in API_KEYS:
 		return make_response({'err':-401,'msg':'unauthorized'}, 401)
 
-	q = request.values.get('q', None)
+	q = get_request_value('q', None)
 	print(f'v0_crawl: {q=}')
 	if (q is None or len(q.strip()) < 1):
 		return page_not_found(NotFound())
