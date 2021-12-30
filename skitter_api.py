@@ -4,10 +4,12 @@ from typing import (
 	)
 import os
 import os.path
+import traceback
 import threading
 from enum import IntEnum
 from flask import Flask, Response, request, render_template, \
 	make_response
+from flask.typing import ResponseReturnValue
 import werkzeug.wrappers
 from werkzeug.datastructures import Headers
 from werkzeug.exceptions import HTTPException, NotFound
@@ -18,63 +20,28 @@ from priv import API_KEYS, NODE_NAME
 app = Flask(__name__, static_url_path='')
 defaultRequestTimeout = 60
 
-FlaskHeaderValue = Union[str, List[str], Tuple[str, ...]]
-FlaskHeaders = Union[
-		Headers,
-		Dict[str, FlaskHeaderValue],
-		List[Tuple[str, FlaskHeaderValue]]
-	]
-BasicFlaskResponse = Union[
-		Response,
-		Any,
-		Dict[str, Any],
-		Generator[Any, None, None]
-	]
-FlaskResponse = Union[
-		BasicFlaskResponse,
-		Tuple[
-			BasicFlaskResponse,
-			FlaskHeaders
-		],
-		Tuple[BasicFlaskResponse, int],
-		Tuple[BasicFlaskResponse, int, FlaskHeaders],
-		Callable[[Dict[str, Any], BasicFlaskResponse], Iterable[bytes]]
-	]
-
 CACHE_BUSTER=1
 
-class WebError(IntEnum):
-	success = 0
-	no_query = -1
-
-errorMessages = {
-		WebError.success: 'success',
-		WebError.no_query: 'no query',
-	}
-
-def getErr(err: WebError, extra: Optional[Dict[str, Any]] = None
-		) -> Dict[str, Any]:
-	base = {'err':int(err),'msg':errorMessages[err]}
-	if extra is not None:
-		base.update(extra)
-	return base
-
-@app.errorhandler(404)
-def page_not_found(e: Exception) -> FlaskResponse:
-	return make_response({'err':404,'msg':'not found'}, 404)
+@app.errorhandler(Exception)
+def page_not_found(error: Exception) -> ResponseReturnValue:
+	if isinstance(error, NotFound):
+		return make_response({'err':404,'msg':'not found'}, 404)
+	print(f'page_not_found: {error}')
+	traceback.print_exc()
+	return make_response({'err':500,'msg':'internal server error'}, 500)
 
 @app.route('/')
-def index() -> FlaskResponse:
+def index() -> ResponseReturnValue:
 	return make_response(render_template('index.html', CACHE_BUSTER=CACHE_BUSTER))
 
 @app.route('/v0', methods=['GET'], strict_slashes=False)
 @app.route('/v0/status', methods=['GET'])
-def v0_status() -> FlaskResponse:
+def v0_status() -> ResponseReturnValue:
 	return make_response({'err':0,'status':'ok',
 		'pid':os.getpid(),'tident':threading.get_ident(),})
 
 @app.route('/v0/cache', methods=['GET'])
-def v0_cache() -> FlaskResponse:
+def v0_cache() -> ResponseReturnValue:
 	apiKey = request.values.get('apiKey', '')
 	if apiKey not in API_KEYS:
 		return make_response({'err':-401,'msg':'unauthorized'}, 401)
@@ -104,7 +71,7 @@ def v0_cache() -> FlaskResponse:
 	return fres
 
 @app.route('/v0/crawl', methods=['GET'])
-def v0_crawl() -> FlaskResponse:
+def v0_crawl() -> ResponseReturnValue:
 	apiKey = request.values.get('apiKey', '')
 	if apiKey not in API_KEYS:
 		return make_response({'err':-401,'msg':'unauthorized'}, 401)
