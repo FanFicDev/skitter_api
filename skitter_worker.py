@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 from typing import TYPE_CHECKING, Optional, List, Tuple, Dict, cast
-if TYPE_CHECKING:
-	import psycopg2
 import base64
 import json
 import sys
@@ -163,8 +161,8 @@ def extractTitle(html: str) -> str:
 		raise Exception('extractTitle: unable to find title')
 	return str(title.get_text())
 
-def scrape(db: 'psycopg2.connection', source: WebSource, workerId: int,
-		url: str, triesLeft: int = 3) -> Web:
+def scrape(source: WebSource, workerId: int, url: str, triesLeft: int = 3
+		) -> Web:
 	if triesLeft <= 0:
 		raise Exception('scrape: exceeded retry count')
 
@@ -179,7 +177,7 @@ def scrape(db: 'psycopg2.connection', source: WebSource, workerId: int,
 	if w.status == 200:
 		dec = enc.decode(w.response, url)
 		if dec is not None and dec[0] is not None:
-			w.encoding = Encoding.lookup(db, dec[0]).id
+			w.encoding = Encoding.lookup(oil.open(), dec[0]).id
 
 		if dec is not None and dec[1] is not None:
 			title = ''
@@ -191,18 +189,18 @@ def scrape(db: 'psycopg2.connection', source: WebSource, workerId: int,
 					or title == 'Attention Required! | Cloudflare':
 				plog(f'scrape: got 200 status CF page, retrying: {triesLeft - 1}')
 				time.sleep(9 + random.random() * 2)
-				return scrape(db, source, workerId, url, triesLeft - 1)
+				return scrape(source, workerId, url, triesLeft - 1)
 
-	w.save(db)
+	w.save(oil.open())
 	return w
 
-def workBlock(db: 'psycopg2.connection', workerId: int, stripeCount: int,
-		stripe: int, cnt: int, source: WebSource) -> None:
+def workBlock(workerId: int, stripeCount: int, stripe: int, cnt: int,
+		source: WebSource) -> None:
 	defaultTimeout = 600.0
 	idleTimeout = 0.25
 	timeout = defaultTimeout
 	while cnt > 0 and timeout > 0:
-		wq = WebQueue.next(db, workerId, stripeCount=stripeCount, stripe=stripe)
+		wq = WebQueue.next(oil.open(), workerId, 0, stripeCount=stripeCount, stripe=stripe)
 		if wq is None:
 			timeout -= idleTimeout
 			time.sleep(idleTimeout)
@@ -211,8 +209,8 @@ def workBlock(db: 'psycopg2.connection', workerId: int, stripeCount: int,
 		plog(f'workBlock: {cnt}: {wq.url}')
 		cnt -= 1
 		timeout = defaultTimeout
-		w = scrape(db, source, workerId, wq.url)
-		wq.dequeue(db)
+		w = scrape(source, workerId, wq.url)
+		wq.dequeue(oil.open())
 		rlen = -1 if w.response is None else len(w.response)
 		plog(f'workBlock:   status {w.status}, {rlen} bytes')
 
@@ -238,8 +236,7 @@ def try_reset(workerId: int) -> bool:
 		plog(f'try_reset: exception:\n{e}\n{traceback.format_exc()}')
 	return False
 
-def work(db: 'psycopg2.connection', workerId: int,
-		stripeCount: int, stripe: int, blockSize: int) -> int:
+def work(workerId: int, stripeCount: int, stripe: int, blockSize: int) -> int:
 	node = get_node_name(workerId)
 	while True:
 		if maybe_restart_vpn(node):
@@ -271,8 +268,8 @@ def work(db: 'psycopg2.connection', workerId: int,
 			plog('work: source is local; aborting')
 			return 1
 
-		WebQueue.resetWorker(db, workerId)
-		workBlock(db, workerId, stripeCount, stripe, blockSize, source)
+		WebQueue.resetWorker(oil.open(), workerId)
+		workBlock(workerId, stripeCount, stripe, blockSize, source)
 
 def main(args: List[str]) -> int:
 	global logFileName
@@ -291,8 +288,7 @@ def main(args: List[str]) -> int:
 	while run:
 		doTryReset = False
 		try:
-			with oil.open() as db:
-				work(db, workerId, stripeCount, stripe, blockSize)
+			work(workerId, stripeCount, stripe, blockSize)
 		except KeyboardInterrupt:
 			run = False
 		except Exception as e:
@@ -300,7 +296,7 @@ def main(args: List[str]) -> int:
 			doTryReset = True
 
 		try:
-			WebQueue.resetWorker(db, workerId)
+			WebQueue.resetWorker(oil.open(), workerId)
 		except KeyboardInterrupt:
 			run = False
 		except:

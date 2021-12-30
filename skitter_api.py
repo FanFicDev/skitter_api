@@ -54,11 +54,11 @@ def v0_cache() -> ResponseReturnValue:
 		return page_not_found(NotFound())
 
 	latest = None
-	with oil.open() as db:
-		if u:
-			latest = Web.latest(db, ulike=u, status=200)
-		else:
-			latest = Web.latest(db, q, status=200)
+	db = oil.open()
+	if u:
+		latest = Web.latest(db, ulike=u, status=200)
+	else:
+		latest = Web.latest(db, q, status=200)
 
 	if latest is None or latest.response is None or latest.created is None:
 		print(f'v0_cache: {q=}, {u=}: not found')
@@ -84,9 +84,9 @@ def v0_crawl() -> ResponseReturnValue:
 	if not q.startswith('http://') and not q.startswith('https://'):
 		return page_not_found(NotFound())
 
-	with oil.open() as db:
-		scraper = RemoteWebScraper(db)
-		scraper.scrape(q)
+	db = oil.open()
+	scraper = RemoteWebScraper(db)
+	scraper.scrape(q)
 
 	return v0_cache()
 
