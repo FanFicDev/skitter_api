@@ -7,3 +7,4 @@ skitter_worker_*.log
 logs/
 skitter_api_master.pid
 __pycache__/
+venv/
