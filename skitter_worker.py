@@ -13,7 +13,7 @@ from oil import oil
 import oil.util as util
 from weaver import WebSource, Encoding, Web, WebQueue
 import weaver.enc as enc
-from priv import LOOKUP_REMOTE_ENDPOINT
+from priv import LOOKUP_REMOTE_ENDPOINT, NODE_NAME
 
 defaultRequestTimeout = 90
 defaultUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36'
@@ -261,7 +261,7 @@ def work(workerId: int, stripeCount: int, stripe: int, blockSize: int) -> int:
 
 		remoteIP = get_worker_ip_fr(workerId)
 		plog(f'work: {remoteIP=}')
-		source = WebSource.lookup(db, node, remoteIP)
+		source = WebSource.lookup(oil.open(), f'{NODE_NAME}_{node}', remoteIP)
 		plog(f'work: source: {source.__dict__}')
 		if source.isLocal() or source.source is None \
 				or source.source.startswith(publicIp):
