@@ -1,0 +1,26 @@
+body { 
+  margin: auto;
+  padding: 1em;
+  max-width: 960px; 
+  font-size: 1.2em;
+  font-family: 'Karla', sans-serif;
+  line-height: 2rem;
+}
+
+body h2 { 
+  font-size: 1.5em; 
+}
+
+blockquote { 
+  font-weight: 300;
+  letter-spacing: 1px;
+  word-break: break-all;
+}
+
+code {
+  font-family: 'Source Code Pro', monospace;
+  color: rgb(206, 54, 75);
+  background: #eee;
+  padding: 2px;
+  font-size: 105%;
+}
