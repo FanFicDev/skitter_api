@@ -1,4 +1,4 @@
-skitter_api is a small wrapper around a set of FlareSolverr instances for load
+skitter_api is a small wrapper around a set of [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) instances for load
 balancing and redundancy purposes. Essentially a series of docker containers
 comprised of gluetun providing a VPN connection and FlareSolverr providing CF
 workarounds are kept alive and proxied to.
