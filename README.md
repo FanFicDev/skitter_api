@@ -19,15 +19,15 @@ example. The general format is:
 
 Create the secret files referenced by the config, for example:
 ```sh
-	./docker/secrets/openvpn_user
-	./docker/secrets/openvpn_password
-	# (these should be single line files)
+./docker/secrets/openvpn_user
+docker/secrets/openvpn_password
+#(these should be single line files)
 ```
 
 Regenerate the docker-compose.yml file:
 ```sh
-	cd docker/
-	./gen_docker_compose.sh > ./docker-compose.yml
+ docker/
+./gen_docker_compose.sh > ./docker-compose.yml
 ```
 
 This depends on the same sql that python-weaver does.
@@ -38,7 +38,7 @@ Copy `priv.ex.py` to `priv.py`, generate a random api key, and optionally set a
 
 Setup the virtualenv to manage dependencies:
 ```sh
-	python -m virtualenv ./venv
-	./venv/bin/python -m pip install --upgrade pip
-	./venv/bin/python -m pip install -r requirements.txt
+python -m virtualenv ./venv
+./venv/bin/python -m pip install --upgrade pip
+./venv/bin/python -m pip install -r requirements.txt
 ```
