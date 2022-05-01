@@ -23,7 +23,8 @@ user_secret_name,pass_secret_name,subdomain,region
 Create the secret files referenced by the config, for example:
 - `./docker/secrets/openvpn_user`
 - `./docker/secrets/openvpn_password`
-#(these should be single line files)
+
+these should be single line files
 
 Regenerate the docker-compose.yml file:
 ```sh
