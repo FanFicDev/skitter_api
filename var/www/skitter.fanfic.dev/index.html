@@ -40,9 +40,10 @@
 			</h4>
 			<ul>
 				<li>
+					<h5><code>/skitter/v0/status</code>:</h5>
 					<p>
-						<code>/skitter/v0/status</code>: Returns the status of the
-						service. If everything is well <code>err</code> should be
+						Returns the status of the service. 
+						If everything is well <code>err</code> should be
 						<code>0</code> and <code>status</code> should be
 						<code>"ok"</code>. Ex:
 					</p>
@@ -51,18 +52,18 @@
 					</blockquote>
 				</li>
 				<li>
+					<h5><code>/skitter/v0/cache?q={URL}&amp;apiKey={key}</code>:</h5>
 					<p>
-						<code>/skitter/v0/cache?q={URL}&amp;apiKey={key}</code>:
-						Returns the most recent cached version of a URL if it is in the cache.
-						Returns a <code>status 404</code> response if no matching
-						cache entry is found.
+						Returns the most recent cached version of a URL if it is in
+						the cache.Returns a <code>status 404</code> response if no
+						matching cache entry is found.
 					</p>
 				</li>
 				<li>
+					<h5><code>/skitter/v0/crawl?q={URL}&amp;apiKey={key}</code>: </h5>
 					<p>
-						<code>/skitter/v0/crawl?q={URL}&amp;apiKey={key}</code>: Crawl a
-						specific URL. It is an error to pass a URL that does not start with
-						<code>https?://</code>.
+						Crawl a specific URL. It is an error to pass a URL 
+						that does not start with <code>https?://</code>.
 					</p>
 				</li>
 			</ul>
@@ -77,7 +78,7 @@
 					in a JSON body then there was an error issued by the API codebase. If
 					there is a positive <code>err</code> code in a JSON body, then
 					the error was issued by the application framework or web server and
-					the numeric value will match the http status code.
+					the numeric value will match the HTTP status code.
 				</p>
 				<ul>
 					<li>
@@ -92,7 +93,7 @@
 						<p>
 							<code>status 400</code>: Bad query, either missing the
 							<code>q</code> query param or it is not a supported URL. A JSON
-							response body will be included, Ex:
+							response body will be included. Ex:
 						</p>
 						<blockquote>{"err":-1,"msg":"missing q param"}</blockquote>
 						<blockquote>{"arg":"foo","err":-2,"msg":"URL is not ffn"}</blockquote>
@@ -116,14 +117,14 @@
 							<code>status 429</code>: Too Many Requests; a
 							<code>Retry-After</code> header will be included with minimum
 							integer number of seconds before the client should make another
-							request. A JSON response body with the same field will be included,
+							request. A JSON response body with the same field will be included.
 							Ex:
 						</p>
 						<blockquote>{"err":-429,"msg":"too many requests","retryAfter":5}</blockquote>
 					</li>
 					<li>
 						<p>
-							<code>status 500</code>: Internal server error. Either weaver
+							<code>status 500</code>: Internal Server Error. Either weaver
 							is misconfigured, or there's an outage somewhere in the pipeline
 							(possibly all FR instances are busy or down).
 						</p>
