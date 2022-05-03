@@ -5,18 +5,39 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>skitter.fanfic.dev</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Karla&family=Source+Code+Pro&display=swap" rel="stylesheet">
-		<link rel="stylesheet" href="style.css">
+		<style>
+			body { 
+				margin: auto;
+				padding: 1em;
+				max-width: 960px; 
+				font-size: 1.2em;
+				font-weight: 500;
+				font-family: 'Verdana', sans-serif;
+				line-height: 2rem;
+			}
+
+			blockquote { 
+				font-weight: 400;
+				letter-spacing: 1px;
+				word-break: break-all;
+			}
+
+			code {
+				font-family: 'Courier New', monospace;
+				color: rgb(206, 54, 75);
+				background: #eee;
+				padding: 2px;
+				font-size: 105%;
+			}
+		</style>
 	</head>
 	<body>
 		<main>
 			<h1>skitter.fanfic.dev</h1>
-			<h3>
+			<h4>
 				Depending on which domain the service is accessed through, there may
 				or may not be a <code>/skitter</code> prefix to these endpoints.
-			</h3>
+			</h4>
 			<ul>
 				<li>
 					<p>
@@ -31,16 +52,16 @@
 				</li>
 				<li>
 					<p>
-						<code>/skitter/v0/cache?q={url}&amp;apiKey={key}</code>:
-						Return the most recent cached version of a url if it is in the cache.
+						<code>/skitter/v0/cache?q={URL}&amp;apiKey={key}</code>:
+						Returns the most recent cached version of a URL if it is in the cache.
 						Returns a <code>status 404</code> response if no matching
 						cache entry is found.
 					</p>
 				</li>
 				<li>
 					<p>
-						<code>/skitter/v0/crawl?q={url}&amp;apiKey={key}</code>: Crawl a
-						specific url. It is an error to pass a url that does not start with
+						<code>/skitter/v0/crawl?q={URL}&amp;apiKey={key}</code>: Crawl a
+						specific URL. It is an error to pass a URL that does not start with
 						<code>https?://</code>.
 					</p>
 				</li>
@@ -50,63 +71,65 @@
 				require a valid <code>apiKey</code> to work. It is recommended
 				to pass the <code>apiKey</code> in the request body.
 			</p>
-			<p>
-				In general, if a response has a negative <code>err</code> code
-				in a json body then there was an error issued by the api codebase. If
-				there is a positive <code>err</code> code in a json body, then
-				the error was issued by the application framework or web server and
-				the numeric value will match the http status code.
+			<div>
+				<p>
+					In general, if a response has a negative <code>err</code> code
+					in a JSON body then there was an error issued by the API codebase. If
+					there is a positive <code>err</code> code in a JSON body, then
+					the error was issued by the application framework or web server and
+					the numeric value will match the http status code.
+				</p>
 				<ul>
 					<li>
 						<p>
-							<code>status 200</code>: body is simply proxied body. A few
+							<code>status 200</code>: Body is simply proxied body. A few
 							informative headers starting with <code>X-Weaver-</code> are
-							included to identify the cached request and actually queried url.
+							included to identify the cached request and actually queried URL.
 							Upstream response headers are not included.
 						</p>
 					</li>
 					<li>
 						<p>
-							<code>status 400</code>: bad query, either missing the
-							<code>q</code> query param or it is not a supported url. A json
-							response body will be included, ex:
+							<code>status 400</code>: Bad query, either missing the
+							<code>q</code> query param or it is not a supported URL. A JSON
+							response body will be included, Ex:
 						</p>
 						<blockquote>{"err":-1,"msg":"missing q param"}</blockquote>
-						<blockquote>{"arg":"foo","err":-2,"msg":"url is not ffn"}</blockquote>
+						<blockquote>{"arg":"foo","err":-2,"msg":"URL is not ffn"}</blockquote>
 					</li>
 					<li>
 						<p>
-							<code>status 401</code>: unauthorized, ensure any required
+							<code>status 401</code>: Unauthorized, ensure any required
 							basic auth parameters are being passed. Ex:
 						</p>
 						<blockquote>{"err":401,"msg":"Unauthorized","nginx":true}</blockquote>
 					</li>
 					<li>
 						<p>
-							<code>status 404</code>: file not found, ensure the url is a
-							valid api endpoint. Ex:
+							<code>status 404</code>: File Not Found, ensure the URL is a
+							valid API endpoint. Ex:
 						</p>
 						<blockquote>{"err":-404,"msg":"not found"}</blockquote>
 					</li>
 					<li>
 						<p>
-							<code>status 429</code>: too many requests; a
+							<code>status 429</code>: Too Many Requests; a
 							<code>Retry-After</code> header will be included with minimum
 							integer number of seconds before the client should make another
-							request. A json response body with the same field will be included,
-							ex:
+							request. A JSON response body with the same field will be included,
+							Ex:
 						</p>
 						<blockquote>{"err":-429,"msg":"too many requests","retryAfter":5}</blockquote>
 					</li>
 					<li>
 						<p>
-							<code>status 500</code>: internal server error. Either weaver
+							<code>status 500</code>: Internal server error. Either weaver
 							is misconfigured, or there's an outage somewhere in the pipeline
 							(possibly all FR instances are busy or down).
 						</p>
 					</li>
 				</ul>
-			</p>
+			</div>
 		</main>
 	</body>
 </html>
