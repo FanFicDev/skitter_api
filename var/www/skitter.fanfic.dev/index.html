@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="A partially distributed on-demand crawling service">
 		<title>skitter.fanfic.dev</title>
 		<style>
 			body { 
@@ -15,7 +16,7 @@
 				font-family: 'Verdana', sans-serif;
 				line-height: 2rem;
 			}
-
+			
 			blockquote { 
 				font-weight: 400;
 				letter-spacing: 1px;
@@ -24,23 +25,27 @@
 
 			code {
 				font-family: 'Courier', 'Courier New', monospace;
-				color: rgb(206, 54, 75);
-				background: #eee;
+				color: #510B15;
+				background: #C4C4C4;
 				padding: 2px;
 				font-size: 105%;
 			}
+
+			/* blockquote > code {
+				background: #FFF;
+			} */
 		</style>
 	</head>
 	<body>
 		<main>
 			<h1>skitter.fanfic.dev</h1>
-			<h4>
+			<p>
 				Depending on which domain the service is accessed through, there may
 				or may not be a <code>/skitter</code> prefix to these endpoints.
-			</h4>
+			</p>
 			<ul>
 				<li>
-					<h5><code>/skitter/v0/status</code>:</h5>
+					<p><code>/skitter/v0/status</code>:</p>
 					<p>
 						Returns the status of the service. 
 						If everything is well <code>err</code> should be
@@ -48,11 +53,13 @@
 						<code>"ok"</code>. Ex:
 					</p>
 					<blockquote>
-						{"err":0,"pid":1539142,"status":"ok","tident":139839177664384}
+						<code>
+							{"err":0,"pid":1539142,"status":"ok","tident":139839177664384}
+						</code>
 					</blockquote>
 				</li>
 				<li>
-					<h5><code>/skitter/v0/cache?q={URL}&amp;apiKey={key}</code>:</h5>
+					<p><code>/skitter/v0/cache?q={URL}&amp;apiKey={key}</code>:</p>
 					<p>
 						Returns the most recent cached version of a URL if it is in
 						the cache.Returns a <code>status 404</code> response if no
@@ -60,7 +67,7 @@
 					</p>
 				</li>
 				<li>
-					<h5><code>/skitter/v0/crawl?q={URL}&amp;apiKey={key}</code>: </h5>
+					<p><code>/skitter/v0/crawl?q={URL}&amp;apiKey={key}</code>: </p>
 					<p>
 						Crawl a specific URL. It is an error to pass a URL 
 						that does not start with <code>https?://</code>.
@@ -72,6 +79,7 @@
 				require a valid <code>apiKey</code> to work. It is recommended
 				to pass the <code>apiKey</code> in the request body.
 			</p>
+			<h2>General Errors and Status Codes</h2> 
 			<div>
 				<p>
 					In general, if a response has a negative <code>err</code> code
@@ -95,22 +103,30 @@
 							<code>q</code> query param or it is not a supported URL. A JSON
 							response body will be included. Ex:
 						</p>
-						<blockquote>{"err":-1,"msg":"missing q param"}</blockquote>
-						<blockquote>{"arg":"foo","err":-2,"msg":"URL is not ffn"}</blockquote>
+						<blockquote>
+							<code>{"err":-1,"msg":"missing q param"}</code>
+						</blockquote>
+						<blockquote>
+							<code>{"arg":"foo","err":-2,"msg":"URL is not ffn"}</code>
+						</blockquote>
 					</li>
 					<li>
 						<p>
 							<code>status 401</code>: Unauthorized, ensure any required
 							basic auth parameters are being passed. Ex:
 						</p>
-						<blockquote>{"err":401,"msg":"Unauthorized","nginx":true}</blockquote>
+						<blockquote>
+							<code>{"err":401,"msg":"Unauthorized","nginx":true}</code>
+						</blockquote>
 					</li>
 					<li>
 						<p>
 							<code>status 404</code>: File Not Found, ensure the URL is a
 							valid API endpoint. Ex:
 						</p>
-						<blockquote>{"err":-404,"msg":"not found"}</blockquote>
+						<blockquote>
+							<code>{"err":-404,"msg":"not found"}</code>
+						</blockquote>
 					</li>
 					<li>
 						<p>
@@ -120,7 +136,9 @@
 							request. A JSON response body with the same field will be included.
 							Ex:
 						</p>
-						<blockquote>{"err":-429,"msg":"too many requests","retryAfter":5}</blockquote>
+						<blockquote>
+							<code>{"err":-429,"msg":"too many requests","retryAfter":5}</code>
+						</blockquote>
 					</li>
 					<li>
 						<p>
