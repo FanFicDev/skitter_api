@@ -1,14 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang=en>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="A partially distributed on-demand crawling service">
 		<title>skitter.fanfic.dev</title>
-		<style type="text/css">
-			body { max-width: 960px; }
-			body { font-size: 1.2em; }
-			body h2 { font-size: 1.5em; }
-			.u { font-weight: bold; }
-			.c { font-family: monospace; }
+		<style>
+			body { 
+				margin: auto;
+				padding: 1em;
+				max-width: 960px; 
+				font-size: 1.2em;
+				font-weight: 500;
+				font-family: 'Verdana', sans-serif;
+				line-height: 2rem;
+			}
+
+			blockquote { 
+				font-weight: 400;
+				letter-spacing: 1px;
+				word-break: break-all;
+			}
+
+			code {
+				font-family: 'Courier', 'Courier New', monospace;
+				color: #510b15;
+				background: #eee;
+				padding: 2px;
+				font-size: 105%;
+			}
 		</style>
 	</head>
 	<body>
@@ -16,74 +36,114 @@
 			<h1>skitter.fanfic.dev</h1>
 			<p>
 				Depending on which domain the service is accessed through, there may
-				or may not be a <span class=c>/skitter</span> prefix to these endpoints.
+				or may not be a <code>/skitter</code> prefix to these endpoints.
 			</p>
+			<ul>
+				<li>
+					<p><code>/skitter/v0/status</code>:</p>
+					<p>
+						Returns the status of the service. 
+						If everything is well <code>err</code> should be
+						<code>0</code> and <code>status</code> should be
+						<code>"ok"</code>. Ex:
+					</p>
+					<blockquote>
+						<code>
+							{"err":0,"pid":1539142,"status":"ok","tident":139839177664384}
+						</code>
+					</blockquote>
+				</li>
+				<li>
+					<p><code>/skitter/v0/cache?q={URL}&amp;apiKey={key}</code>:</p>
+					<p>
+						Returns the most recent cached version of a URL if it is in
+						the cache.Returns a <code>status 404</code> response if no
+						matching cache entry is found.
+					</p>
+				</li>
+				<li>
+					<p><code>/skitter/v0/crawl?q={URL}&amp;apiKey={key}</code>: </p>
+					<p>
+						Crawl a specific URL. It is an error to pass a URL 
+						that does not start with <code>https?://</code>.
+					</p>
+				</li>
+			</ul>
 			<p>
-				<span class=c>/skitter/v0/status</span>: Returns the status of the
-				service. If everything is well <span class=c>err</span> should be
-				<span class=c>0</span> and <span class=c>status</span> should be
-				<span class=c>"ok"</span>. Ex:
+				Endpoints with a non-optional <code>apiKey</code> parameter
+				require a valid <code>apiKey</code> to work. It is recommended
+				to pass the <code>apiKey</code> in the request body.
 			</p>
-			<p class=c>
-				{"err":0,"pid":1539142,"status":"ok","tident":139839177664384}
-			</p>
-			<p>
-				<span class=c>/skitter/v0/cache?q={url}&amp;apiKey={key}</span>:
-				Return the most recent cached version of a url if it is in the cache.
-				Returns a <span class=c>status 404</span> response if no matching
-				cache entry is found.
-			</p>
-			<p>
-				<span class=c>/skitter/v0/crawl?q={url}&amp;apiKey={key}</span>: Crawl a
-				specific url. It is an error to pass a url that does not start with
-				<span class=c>https?://</span>.
-			</p>
-			<p>
-				Endpoints with a non-optional <span class=c>apiKey</span> parameter
-				require a valid <span class=c>apiKey</span> to work. It is recommended
-				to pass the <span class=c>apiKey</span> in the request body.
-			</p>
-			<p>
-				In general, if a response has a negative <span class=c>err</span> code
-				in a json body then there was an error issued by the api codebase. If
-				there is a positive <span class=c>err</span> code in a json body, then
-				the error was issued by the application framework or web server and
-				the numeric value will match the http status code.
-			<p>
-				<span class=c>status 200</span>: body is simply proxied body. A few
-				informative headers starting with <span class=c>X-Weaver-</span> are
-				included to identify the cached request and actually queried url.
-				Upstream response headers are not included.</p>
-			<p>
-				<span class=c>status 400</span>: bad query, either missing the
-				<span class=c>q</span> query param or it is not a supported url. A json
-				response body will be included, ex:
-			</p>
-			<p class=c>{"err":-1,"msg":"missing q param"}</p>
-			<p class=c>{"arg":"foo","err":-2,"msg":"url is not ffn"}</p>
-			<p>
-				<span class=c>status 401</span>: unauthorized, ensure any required
-				basic auth parameters are being passed. Ex:
-			</p>
-			<p class=c>{"err":401,"msg":"Unauthorized","nginx":true}</p>
-			<p>
-				<span class=c>status 404</span>: file not found, ensure the url is a
-				valid api endpoint. Ex:
-			</p>
-			<p class=c>{"err":-404,"msg":"not found"}</p>
-			<p>
-				<span class=c>status 429</span>: too many requests; a
-				<span class=c>Retry-After</span> header will be included with minimum
-				integer number of seconds before the client should make another
-				request. A json response body with the same field will be included,
-				ex:
-			</p>
-			<p class=c>{"err":-429,"msg":"too many requests","retryAfter":5}</p>
-			<p>
-				<span class=c>status 500</span>: internal server error. Either weaver
-				is misconfigured, or there's an outage somewhere in the pipeline
-				(possibly all FR instances are busy or down).
-			</p>
+			<h2>General Errors and Status Codes</h2> 
+			<div>
+				<p>
+					In general, if a response has a negative <code>err</code> code
+					in a JSON body then there was an error issued by the API codebase. If
+					there is a positive <code>err</code> code in a JSON body, then
+					the error was issued by the application framework or web server and
+					the numeric value will match the HTTP status code.
+				</p>
+				<ul>
+					<li>
+						<p>
+							<code>status 200</code>: Body is simply proxied body. A few
+							informative headers starting with <code>X-Weaver-</code> are
+							included to identify the cached request and actually queried URL.
+							Upstream response headers are not included.
+						</p>
+					</li>
+					<li>
+						<p>
+							<code>status 400</code>: Bad query, either missing the
+							<code>q</code> query param or it is not a supported URL. A JSON
+							response body will be included. Ex:
+						</p>
+						<blockquote>
+							<code>{"err":-1,"msg":"missing q param"}</code>
+						</blockquote>
+						<blockquote>
+							<code>{"arg":"foo","err":-2,"msg":"URL is not ffn"}</code>
+						</blockquote>
+					</li>
+					<li>
+						<p>
+							<code>status 401</code>: Unauthorized, ensure any required
+							basic auth parameters are being passed. Ex:
+						</p>
+						<blockquote>
+							<code>{"err":401,"msg":"Unauthorized","nginx":true}</code>
+						</blockquote>
+					</li>
+					<li>
+						<p>
+							<code>status 404</code>: File Not Found, ensure the URL is a
+							valid API endpoint. Ex:
+						</p>
+						<blockquote>
+							<code>{"err":-404,"msg":"not found"}</code>
+						</blockquote>
+					</li>
+					<li>
+						<p>
+							<code>status 429</code>: Too Many Requests; a
+							<code>Retry-After</code> header will be included with minimum
+							integer number of seconds before the client should make another
+							request. A JSON response body with the same field will be included.
+							Ex:
+						</p>
+						<blockquote>
+							<code>{"err":-429,"msg":"too many requests","retryAfter":5}</code>
+						</blockquote>
+					</li>
+					<li>
+						<p>
+							<code>status 500</code>: Internal Server Error. Either weaver
+							is misconfigured, or there's an outage somewhere in the pipeline
+							(possibly all FR instances are busy or down).
+						</p>
+					</li>
+				</ul>
+			</div>
 		</main>
 	</body>
 </html>
